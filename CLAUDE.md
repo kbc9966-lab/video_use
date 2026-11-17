@@ -147,6 +147,16 @@ FCP가 "각각의 미디어가 없는 유효하지 않은 편집입니다"를 �
 - caption 편집: `타임라인 인덱스`(⌘⇧2) → "캡션" 탭 → 클릭으로 편집
 - FCP 11+에서는 `윈도우 → 작업공간에서 보기 → 캡션`이 별도 항목 없을 수 있음 → 타임라인 인덱스로
 
+**Vrew** (비공식 포맷, `edl_to_vrew.py`):
+
+- `footage/edit/timeline.vrew` 더블클릭 (또는 Vrew → 프로젝트 열기)
+- 원본 영상은 **절대경로로 참조**(임베드 X) — 원본을 옮기면 Vrew가 "파일 찾기"를 요구함
+- 컷 = 트랜스크립트에서 단어를 뺀 것 → 잘린 부분은 Vrew 안에서 복구 가능, 단어 단위 텍스트 편집 그대로 사용
+- 단어 트랜스크립트 필요: `sources[].words` 또는 `footage/edit/transcripts/<영상이름>.json` 자동 탐색 (없으면 무음 클립)
+- EDL `subtitles`가 있으면 그 텍스트가 Vrew 자막이 됨, 없으면 트랜스크립트 단어가 자막
+- 자막 스타일 기본값은 `helpers/vrew_template/template.json` (사용자 기존 Vrew 프로젝트에서 추출)
+- Vrew 업데이트로 포맷이 바뀌면 깨질 수 있음 → 그때는 사용자 최신 .vrew 하나를 받아 template.json 재추출
+
 **Premiere Pro**:
 
 - `파일 → 가져오기` → `footage/edit/timeline.xml`

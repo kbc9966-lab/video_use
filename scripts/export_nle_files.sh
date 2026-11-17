@@ -18,6 +18,7 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV="$HOME/Developer/video-use/.venv/bin/python"
+[ -x "$VENV" ] || VENV="$HOME/Developer/video-use/.venv/Scripts/python.exe"  # Windows venv
 HELPERS="$REPO/.claude/skills/motion-pipeline/helpers"
 
 EDL="${1:-$REPO/footage/edit/edl.json}"
@@ -30,7 +31,7 @@ fail() { printf '\033[0;31m✗\033[0m %s\n' "$*" >&2; exit 1; }
 
 echo "── EDL → 양 NLE 파일 export ──"
 echo "  EDL:      $EDL"
-echo "  output:   $EDIT_DIR/{timeline.fcpxml, timeline.xml}"
+echo "  output:   $EDIT_DIR/{timeline.fcpxml, timeline.xml, timeline.vrew}"
 echo
 
 "$VENV" "$HELPERS/edl_to_fcpxml.py" "$EDL" -o "$EDIT_DIR/timeline.fcpxml" \
@@ -41,8 +42,14 @@ echo
   && ok "$EDIT_DIR/timeline.xml (Premiere Pro, FCP7 XML)" \
   || fail "FCP7 XML 생성 실패"
 
+# Vrew (비공식 포맷) — 실패해도 FCP/Premiere 산출물은 유지
+"$VENV" "$HELPERS/edl_to_vrew.py" "$EDL" -o "$EDIT_DIR/timeline.vrew" \
+  && ok "$EDIT_DIR/timeline.vrew (Vrew)" \
+  || printf '\033[0;33m!\033[0m %s\n' "Vrew 프로젝트 생성 실패 (FCP/Premiere 파일은 정상)"
+
 echo
 echo "다음 단계:"
+echo "  • Vrew:          timeline.vrew 더블클릭 → 컷 + 단어 단위 자막 (잘린 부분은 Vrew에서 복구 가능)"
 echo "  • Final Cut Pro: timeline.fcpxml 임포트 → 컷 + 자막 overlay 자동 포함"
 echo "  • Premiere Pro:  timeline.xml 임포트  → 컷 + 자막 overlay 자동 포함"
 echo "                    필요시 Captions 패널에서 subtitles.srt 별도 import"

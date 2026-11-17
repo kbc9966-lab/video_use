@@ -252,10 +252,13 @@ bash scripts/export_nle_files.sh
 
 ```
 edl.json  ─┬─→ edl_to_fcpxml.py    → footage/edit/timeline.fcpxml  (Final Cut Pro)
-           └─→ edl_to_fcp7_xml.py  → footage/edit/timeline.xml     (Premiere Pro, FCP7 XML)
+           ├─→ edl_to_fcp7_xml.py  → footage/edit/timeline.xml     (Premiere Pro, FCP7 XML)
+           └─→ edl_to_vrew.py      → footage/edit/timeline.vrew    (Vrew, 비공식 포맷)
 ```
 
-두 파일 모두 EDL의 cuts(V1) + overlays(V2 자막 mov) + sources를 동일하게 표현. 어느 NLE 사용자든 동일한 작업물 받음.
+두 XML 파일은 EDL의 cuts(V1) + overlays(V2 자막 mov) + sources를 동일하게 표현. 어느 NLE 사용자든 동일한 작업물 받음.
+
+`timeline.vrew`는 cuts + 단어 단위 트랜스크립트(+ EDL `subtitles` 텍스트를 자막으로)만 담는다. overlays(자막 mov)는 넣지 않음. 단어 트랜스크립트는 `sources[].words` → `<edit>/transcripts/<영상이름>.json` 순으로 자동 탐색하고, 직접 지정은 `--words s1=path.json`. Vrew 실패는 경고만 하고 FCP/Premiere 산출물은 유지.
 
 매 iteration마다 edl.json을 다시 emit하고 위 스크립트 재실행 — mp4와 양 NLE 파일이 항상 동기.
 
