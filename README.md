@@ -32,9 +32,23 @@ Claude Code(또는 AGENTS.md를 읽는 에이전트)로 이 폴더를 열면 **�
 
 ## 빠른 시작
 
+macOS / Linux:
+
 ```bash
 bash scripts/setup.sh
 ```
+
+Windows (PowerShell — Git·uv·Node·ffmpeg·Python 3.12 까지 winget 으로 자동 설치):
+
+```powershell
+git clone https://github.com/kbc9966-lab/video_use
+cd video_use
+powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1
+```
+
+> Git 이 아직 없으면 GitHub 페이지의 **Code → Download ZIP** 으로 받아 압축을 풀고 같은 폴더에서 세 번째 줄만 실행해도 됩니다 (스크립트가 Git 을 설치).
+
+**Vrew 사용자**: 편집 결과가 `footage/edit/timeline.vrew` 로도 나옵니다 — 더블클릭하면 컷 + 단어 단위 자막이 들어간 Vrew 프로젝트가 열립니다 (`edl_to_vrew.py`, 비공식 포맷).
 
 그다음 Claude Code에서 자연어로:
 
