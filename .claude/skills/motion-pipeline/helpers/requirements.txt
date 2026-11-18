@@ -9,3 +9,10 @@
 
 # Microsoft Edge TTS — free Korean/English voices, no API key
 edge-tts>=7.2.0
+
+# Local word-level ASR fallback (transcribe_local.py) when hyperframes'
+# whisper.cpp is unavailable (e.g. Windows without build tools). No API key.
+faster-whisper>=1.0.0
+
+# Higgsfield API SDK (higgsfield_i2v.py). Credentials: HF_KEY in repo-root .env
+higgsfield-client

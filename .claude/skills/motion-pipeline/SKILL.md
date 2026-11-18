@@ -355,11 +355,30 @@ bash scripts/export_nle_files.sh
   .claude/skills/motion-pipeline/helpers/edl_to_fcp7_xml.py edl.json -o timeline.xml
 ```
 
+## Windows 메모 (검증됨)
+
+venv python은 `~/Developer/video-use/.venv/Scripts/python.exe` (`bin/python` 아님). 셋업은 `scripts/setup_windows.ps1`.
+
+| 상황 | 해결 |
+| --- | --- |
+| `npx hyperframes transcribe` → `whisper_unavailable` (whisper.cpp 없음) | `helpers/transcribe_local.py <video>` — faster-whisper `large-v3-turbo` int8 (저메모리), Scribe 호환 JSON을 `<edit>/transcripts/<stem>.json`에 캐시 |
+| `render.py`가 cp949로 EDL 읽다 크래시 / 자막 경로 `\` 이스케이프 / Helvetica에 한글 없음 | `helpers/render_win.py` — render.py와 같은 CLI. UTF-8 모드 + 경로 수정 + 한글 폰트. 자막은 출력 해상도의 `.ass` 권장 (PlayResX/Y = 1080/1920) |
+| render.py는 세그먼트를 30fps 프레임 단위로 **올림** 추출 | 자막/오버레이 출력 타임라인 offset을 `ceil(dur*fps)/fps`로 누적해야 컷마다 ~1–2프레임 드리프트 없음 |
+| Whisper 단어 end가 뒤 무음까지 늘어남 | 컷 경계는 `silencedetect` + 50ms RMS 맵으로 확정 |
+
+### AI 인서트 (GPT 이미지 → Higgsfield 영상)
+
+1. 참고 이미지: Codex CLI 내장 `image_gen` (ChatGPT **유료 요금제** 필요 — Free는 도구 없음). `codex exec`에 프롬프트는 **stdin**으로 (`codex.cmd`가 인자 개행을 자름), 원본 프레임은 `-i`로 첨부. 결과는 `~/.codex/generated_images/`에 저장되니 거기서 복사.
+2. 영상: `helpers/higgsfield_i2v.py image.png -o out.mp4 --prompt "..."` — 기본 `bytedance/seedance-2.5/image-to-video`, 5s, 1080p, 오디오 off. 자격증명은 repo 루트 `.env`의 `HF_KEY=<id>:<secret>`. **실행마다 크레딧 차감 → 사용자 확인 후 실행.**
+3. 1080×1920·30fps로 트림/변환 후 EDL `overlays`에 넣고 `render_win.py`로 렌더 (오버레이 PTS shift, 자막 LAST는 render.py가 보장). `timeline.vrew`에는 오버레이가 들어가지 않음.
+
 ## 환경변수
 
 **Mode B는 키 0개.** Edge TTS와 hyperframes Whisper 모두 무료, 키 불필요.
 
 `ELEVENLABS_API_KEY`는 **Mode A에서 Scribe를 명시적으로 선택할 때만** 필요. `~/Developer/video-use/.env`에 설정.
+
+`HF_KEY`(Higgsfield, `<key id>:<secret>`)는 AI 인서트를 만들 때만 필요. **이 repo 루트의 `.env`**(gitignore됨)에 설정. 값은 출력/커밋 금지.
 
 ## 셋업 (이 repo는 이미 완료)
 
